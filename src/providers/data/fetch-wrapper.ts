@@ -6,7 +6,7 @@ type Error = {
 };
 
 const customFetch = async (url: string, options: RequestInit) => {
-  const accessToken = localStorage.getItem("accessToken");
+  const accessToken = localStorage.getItem("access_token");
 
   const headers = options.headers as Record<string, string>;
 
@@ -21,12 +21,12 @@ const customFetch = async (url: string, options: RequestInit) => {
   });
 };
 
-const getGraphQlErrors = (
+const getGraphQLErrors = (
   body: Record<"errors", GraphQLFormattedError[] | undefined>
 ): Error | null => {
   if (!body) {
     return {
-      message: "Unknown Error",
+      message: "Unknown error",
       statusCode: "INTERNAL_SERVER_ERROR",
     };
   }
@@ -34,15 +34,12 @@ const getGraphQlErrors = (
   if ("errors" in body) {
     const errors = body?.errors;
 
-    const message = errors?.map((error) => error.message).join(", ");
-    const code =
-      typeof errors?.[0]?.extensions?.code === "string"
-        ? errors?.[0]?.extensions?.code
-        : "500";
+    const messages = errors?.map((error) => error?.message)?.join("");
+    const code = errors?.[0]?.extensions?.code;
 
     return {
-      message: message || JSON.stringify(errors),
-      statusCode: code,
+      message: messages || JSON.stringify(errors),
+      statusCode: code || 500,
     };
   }
 
@@ -55,7 +52,7 @@ export const fetchWrapper = async (url: string, options: RequestInit) => {
   const responseClone = response.clone();
   const body = await responseClone.json();
 
-  const error = getGraphQlErrors(body);
+  const error = getGraphQLErrors(body);
 
   if (error) {
     throw error;

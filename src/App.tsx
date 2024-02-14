@@ -16,6 +16,7 @@ import { App as AntdApp } from "antd";
 import { Home, Login, Register, ForgotPassword } from "./pages";
 import { dataProvider, liveProvider, authProvider } from "./providers";
 import { Layout } from "./components";
+import { resources } from "./config/resources";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
               notificationProvider={useNotificationProvider}
               routerProvider={routerBindings}
               authProvider={authProvider}
+              resources={resources}
               options={{
                 syncWithLocation: true,
                 warnWhenUnsavedChanges: true,
